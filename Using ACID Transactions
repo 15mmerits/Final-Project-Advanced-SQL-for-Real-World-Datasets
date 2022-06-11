@@ -1,0 +1,83 @@
+1. Update your stored procedure definition. Add a generic ELSE clause to the IF statement 
+   that rolls back the current work if the score did not fit any of the preceding categories.
+>>
+
+--SET TERMINATOR@
+CREATE OR REPLACE PROCEDURE UPDATE_LEADERS_SCORE(
+IN in_School_ID INTEGER, IN in_Leader_Score INTEGER)
+
+LANGUAGE SQL 
+MODIFIES SQL DATA 
+
+BEGIN 
+	UPDATE CHICAGO_PUBLIC_SCHOOLS
+	SET "Leaders_Score" = in_Leader_Score
+	WHERE "School_ID" = in_School_ID;
+		IF in_Leader_Score>0 and in_Leader_Score<20
+		THEN 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Very Weak' ; 
+		elseif in_Leader_Score<40
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Weak' ;
+		elseif in_Leader_Score<60
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Average' ;
+		elseif in_Leader_Score<80
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Strong' ;
+		elseif in_Leader_Score<100
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Very Strong' ;
+		else 
+			ROLLBACK WORK;
+		ENDIF;
+END
+@
+
+
+2. Update your stored procedure definition again. Add a statement to commit the 
+current unit of work at the end of the procedure.
+>>>
+
+--SET TERMINATOR@
+CREATE OR REPLACE PROCEDURE UPDATE_LEADERS_SCORE(
+IN in_School_ID INTEGER, IN in_Leader_Score INTEGER)
+
+LANGUAGE SQL 
+MODIFIES SQL DATA 
+
+BEGIN 
+	UPDATE CHICAGO_PUBLIC_SCHOOLS
+	SET "Leaders_Score" = in_Leader_Score
+	WHERE "School_ID" = in_School_ID;
+		IF in_Leader_Score>0 and in_Leader_Score<20
+		THEN 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Very Weak' ; 
+		elseif in_Leader_Score<40
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Weak' ;
+		elseif in_Leader_Score<60
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Average' ;
+		elseif in_Leader_Score<80
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Strong' ;
+		elseif in_Leader_Score<100
+		then 
+			UPDATE CHICAGO_PUBLIC_SCHOOLS
+			SET "Leaders_Icon" = 'Very Strong' ;
+		else 
+			ROLLBACK WORK;
+		ENDIF;
+			COMMIT WORK;
+END 
+@
